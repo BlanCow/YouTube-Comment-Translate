@@ -23,11 +23,20 @@
     function TranslateButton_Translate() {
         this.onclick = TranslateButton_SetState;
         this.style.cursor = "wait";
-        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&q=${encodeURIComponent(this._otext.innerText)}`)
+
+        let tmp = document.createElement("div");
+        tmp.innerHTML = this._otext.innerHTML;
+        for (const img of tmp.querySelectorAll('img.emoji')) {
+            img.after(img.alt);
+            img.remove();
+            // replace the image with its alternative emoji
+        }
+
+        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&q=${encodeURIComponent(tmp.innerText)}`)
             .then(response => response.json()).then(json => {
-                console.log("fetched");
+
                 for (let i = 0; i < json[0].length; i++) {
-                    let line = encodeHTMLEntities(json[0][i][0]);
+                    let line = json[0][i][0].replace(/</g, '&lt;').replace(/>/g, '&gt;');
                     if (line.endsWith("\n")) line += '<br>';
 
                     this._ntext.innerHTML += line;
@@ -62,12 +71,6 @@
         return tb;
     }
 
-    function encodeHTMLEntities(text) {
-        var textArea = document.createElement('textarea');
-        textArea.innerText = text;
-        return textArea.innerHTML;
-    }
-
     /* Query Selectors */
     // From main
     const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-button";
@@ -78,7 +81,6 @@
     var TARGET = getDefaultLanguage();
 
     browser.storage.local.get(storage_key).then((obj) => {
-        console.log(obj);
         if (obj.hasOwnProperty(storage_key)) {
             TARGET = obj[storage_key];
         }
