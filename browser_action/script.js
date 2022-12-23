@@ -11,7 +11,6 @@ const select = document.getElementById('languages');
 let selectHtml = '';
 for (const iso_code of supported_languages) {
     let language = capitalizeFirstLetter(languageName.of(iso_code));
-    // how capitalize the first letter of language 
 
     selectHtml += `<option value="${iso_code}">${language}</option>`;
 }
