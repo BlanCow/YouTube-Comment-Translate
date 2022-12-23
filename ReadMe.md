@@ -23,10 +23,14 @@ After installing, this icon will appear next to every comment</br>
 
 ### Changing the language
 
-The default target language is your browser language. To change it, click in the top right corner of firefox on the extension icon</br>
+The default target language is your browser language. To change it, click in the top right corner of firefox on the extension icon:
+
 <img src="docs/change_language_1.png">
-and select a new target language by clicking on the dropdown.</br>
-<img src="docs/change_language_2.png"></br>
+
+and select a new target language by clicking on the dropdown:
+
+<img src="docs/change_language_2.png">
+
 The changes are applied instantly so no need to refresh the youtube page
 
 ## Installation
