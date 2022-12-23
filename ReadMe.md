@@ -3,7 +3,7 @@
 
 <p align="center">
 	</br></br>
-		<a href="https://addons.mozilla.org">
+		<a href="https://addons.mozilla.org/en-US/firefox/addon/youtube-comment-translate/">
 			<img src="docs/get-the-addon.png">
 	</br></br>
 </p>
@@ -35,6 +35,6 @@ The changes are applied instantly so no need to refresh the youtube page
 
 ## Installation
 
-simply download the extension from https://addons.mozilla.org
+simply download the extension from https://addons.mozilla.org/en-US/firefox/addon/youtube-comment-translate/
 
 The icons used in the README are from the open-source [papirus-icon-theme](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) project
