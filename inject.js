@@ -1,98 +1,134 @@
-(function main () {
-	function ReplaceNode(a, b) {
-		a.parentNode.appendChild(b);
-		a.parentNode.removeChild(a);
-	}
+// firefox version of https://github.com/toluschr/YouTube-Comment-Translate
 
-	function TranslateButton_SetState() {
-		if (this._ntext.parentNode !== null) {
-			ReplaceNode(this._ntext, this._otext);
-			this.innerText = TRANSLATE_TEXT;
-		} else {
-			ReplaceNode(this._otext, this._ntext);
-			this.innerText = UNDO_TEXT;
-		}
-	}
 
-	function TranslateButton_Translate() {
-		this.onclick = TranslateButton_SetState;
-		fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&q=${encodeURIComponent(this._otext.innerText)}`)
-			.then(response => response.json()).then(json => {
-				for (let i = 0; i < json[0].length; i++) this._ntext.innerText += json[0][i][0].replace('\n', ' ');
-				this.onclick();
-			});
-	}
 
-	function ResetTranslateButton(tb) {
-		if (tb._ntext.parentNode !== null) ReplaceNode(tb._ntext, tb._otext);
+(function main() {
+    function ReplaceNode(a, b) {
+        a.parentNode.appendChild(b);
+        a.parentNode.removeChild(a);
+    }
 
-		tb._ntext.innerText = "";
-		tb.innerText = TRANSLATE_TEXT;
-		tb.onclick = TranslateButton_Translate;
-	}
+    function TranslateButton_SetState() {
+        this.style.cursor = 'pointer';
+        if (this._ntext.parentNode !== null) {
+            ReplaceNode(this._ntext, this._otext);
+            this.innerHTML = translate_icon();
+        } else {
 
-	function TranslateButton(main) {
-		let tb = document.createElement("a");
-		tb.id = "translate-button";
-		tb.style = "margin-left: 5px";
-		tb.classList = "yt-simple-endpoint style-scope yt-formatted-string";
+            ReplaceNode(this._otext, this._ntext);
+            this.innerHTML = UNDO_ICON;
+        }
+    }
 
-		tb._otext = main.querySelector(QS_CONTENT_TEXT);
-		tb._otext.addEventListener("DOMSubtreeModified", _ => ResetTranslateButton(tb));
+    function TranslateButton_Translate() {
+        this.onclick = TranslateButton_SetState;
+        this.style.cursor = "wait";
+        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&q=${encodeURIComponent(this._otext.innerText)}`)
+            .then(response => response.json()).then(json => {
+                console.log("fetched");
+                for (let i = 0; i < json[0].length; i++) {
+                    let line = encodeHTMLEntities(json[0][i][0]);
+                    if (line.endsWith("\n")) line += '<br>';
 
-		tb._ntext = document.createElement("div");
-		tb._ntext.style.whiteSpace = "pre-wrap";
-		tb._ntext.id = "content-text";
-		tb._ntext.classList = "style-scope ytd-comment-renderer translate-text yt-formatted-string";
+                    this._ntext.innerHTML += line;
+                }
+                this.onclick();
+            });
+    }
 
-		ResetTranslateButton(tb);
-		return tb;
-	}
+    function ResetTranslateButton(tb) {
+        if (tb._ntext.parentNode !== null) ReplaceNode(tb._ntext, tb._otext);
 
-	/* Query Selectors */
-	// From main
-	const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-button";
-	const QS_CONTENT_TEXT = "#expander>#content>#content-text";
-	const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string";
+        tb._ntext.innerText = "";
+        tb.innerHTML = translate_icon();
+        tb.onclick = TranslateButton_Translate;
+    }
 
-	/* User settings */
-	var TRANSLATE_TEXT = "translate", UNDO_TEXT = "undo", TARGET = navigator.language || navigator.userLanguage;
+    function TranslateButton(main) {
+        let tb = document.createElement("a");
+        tb.id = "translate-button";
+        tb.style = "margin-left: 5px; cursor: pointer;";
+        tb.classList = "yt-simple-endpoint style-scope yt-formatted-string";
 
-	if (typeof(chrome) !== "undefined" && typeof(chrome.storage) != "undefined")
-		chrome.storage.sync.get({translate_text: TRANSLATE_TEXT, undo_text: UNDO_TEXT, target_language: TARGET}, items => {
-			TRANSLATE_TEXT = items.translate_text;
-			UNDO_TEXT = items.undo_text;
-			TARGET = items.target_language;
-			inject();
-		});
-	else
-		inject();
+        tb._otext = main.querySelector(QS_CONTENT_TEXT);
+        tb._otext.addEventListener("DOMSubtreeModified", _ => ResetTranslateButton(tb));
 
-	/* Functions */
-	// Inject as soon as the comment section was loaded
-	function inject () {
-		const observerConfig = {childList: true, subtree: true};
-		const commentObserver = new MutationObserver(e => {
-			for (let mut of e) {
-				/*if (mut.target.tagName.toLowerCase() == "ytd-comments") {
-					commentObserver.disconnect();
-					commentObserver.observe(mut.target, observerConfig);
-				} else */if (mut.target.id == "contents") {
-					for (let n of mut.addedNodes) {
-						let main = n.querySelector("#body>#main");
-						if (!main) continue;
+        tb._ntext = document.createElement("div");
+        tb._ntext.style.whiteSpace = "pre-wrap";
+        tb._ntext.id = "content-text";
+        tb._ntext.classList = "style-scope ytd-comment-renderer translate-text yt-formatted-string";
 
-						let tb = main.querySelector(QS_TRANSLATE_BUTTON);
-						if (tb != null) {
-							ResetTranslateButton(tb);
-						} else {
-							main.querySelector(QS_BUTTON_CONTAINER).appendChild(TranslateButton(main));
-						}
-					}
-				}
-			}
-		});
+        ResetTranslateButton(tb);
+        return tb;
+    }
 
-		commentObserver.observe(document, observerConfig);
-	}
+    function encodeHTMLEntities(text) {
+        var textArea = document.createElement('textarea');
+        textArea.innerText = text;
+        return textArea.innerHTML;
+    }
+
+    /* Query Selectors */
+    // From main
+    const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-button";
+    const QS_CONTENT_TEXT = "#expander>#content>#content-text";
+    const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string";
+
+    /* User settings */
+    var TARGET = getDefaultLanguage();
+
+    browser.storage.local.get(storage_key).then((obj) => {
+        console.log(obj);
+        if (obj.hasOwnProperty(storage_key)) {
+            TARGET = obj[storage_key];
+        }
+    });
+
+    browser.storage.onChanged.addListener(function (obj) {
+        if (obj.hasOwnProperty(storage_key) && obj[storage_key].hasOwnProperty('newValue')) {
+            TARGET = obj[storage_key].newValue;
+            // undo all translated text
+            for (const el of document.querySelectorAll('.undo-icon')) { el.click(); }
+            // remove all icons
+            for (const el of document.querySelectorAll(QS_TRANSLATE_BUTTON)) { el.remove(); }
+            // reinject 
+            for (const el of document.querySelectorAll('#contents #body>#main')) {
+                el.querySelector(QS_BUTTON_CONTAINER).appendChild(TranslateButton(el));
+            }
+        }
+    });
+
+    const languageName = new Intl.DisplayNames(['en'], { type: 'language' });
+
+    var translate_text = () => { return "Translate to " + languageName.of(TARGET); };
+    var translate_icon = () => { return `<img src="${browser.runtime.getURL('icons/translate.png')}" alt="${translate_text()}" title="${translate_text()}" width="16" height="16" style="vertical-align: top">`; };
+    var UNDO_ICON = `<img src="${browser.runtime.getURL('icons/undo.png')}" class="undo-icon" alt="Undo" title="Undo" width="16" height="16" style="vertical-align: top">`;
+    inject();
+
+    /* Functions */
+    // Inject as soon as the comment section was loaded
+    function inject() {
+        const observerConfig = { childList: true, subtree: true };
+        const commentObserver = new MutationObserver(e => {
+            for (let mut of e) {
+
+                if (mut.target.id == "contents") {
+                    for (let n of mut.addedNodes) {
+                        let main = n.querySelector("#body>#main");
+                        if (!main) continue;
+
+                        let tb = main.querySelector(QS_TRANSLATE_BUTTON);
+                        if (tb != null) {
+                            ResetTranslateButton(tb);
+                        } else {
+                            main.querySelector(QS_BUTTON_CONTAINER).appendChild(TranslateButton(main));
+                        }
+                    }
+                }
+            }
+        });
+
+        commentObserver.observe(document, observerConfig);
+
+    }
 })();
