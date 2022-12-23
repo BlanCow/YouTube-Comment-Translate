@@ -37,7 +37,8 @@
 
                 for (let i = 0; i < json[0].length; i++) {
                     let line = json[0][i][0].replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    if (line.endsWith("\n")) line += '<br>';
+
+                    if (line.endsWith("\n")) line = '<div>' + line + '</div>';
 
                     this._ntext.innerHTML += line;
                 }
