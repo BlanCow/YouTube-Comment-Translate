@@ -34,14 +34,14 @@
 
         fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&q=${encodeURIComponent(tmp.innerText)}`)
             .then(response => response.json()).then(json => {
-
+                this._ntext.innerHTML = '<div>';
                 for (let i = 0; i < json[0].length; i++) {
                     let line = json[0][i][0].replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-                    if (line.endsWith("\n")) line = '<div>' + line + '</div>';
-
+                    if (line.endsWith("\n")) line += '</div><div>';
                     this._ntext.innerHTML += line;
                 }
+                this._ntext.innerHTML += '</div>';
                 this.onclick();
             });
     }
