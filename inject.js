@@ -11,11 +11,12 @@
     function TranslateButton_SetState() {
         this.style.cursor = 'pointer';
         if (this._ntext.parentNode !== null) {
+            this._ntext.parentNode.parentNode.querySelector('#less').click();
             ReplaceNode(this._ntext, this._otext);
             this.innerHTML = translate_icon();
             this.setAttribute('data-translated', 0);
         } else {
-
+            this._otext.parentNode.parentNode.querySelector('#less').click();
             ReplaceNode(this._otext, this._ntext);
             this.innerHTML = UNDO_ICON;
             this.setAttribute('data-translated', 1);
@@ -34,17 +35,46 @@
             // replace the image with its alternative emoji
         }
 
-        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&q=${encodeURIComponent(tmp.innerText)}`)
-            .then(response => response.json()).then(json => {
-                this._ntext.innerHTML = '<div>';
-                for (let i = 0; i < json[0].length; i++) {
-                    let line = json[0][i][0].replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const anchors = tmp.querySelectorAll('a.yt-simple-endpoint');
 
-                    if (line.endsWith("\n")) line += '</div><div>';
-                    this._ntext.innerHTML += line;
+        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&dj=1&q=${encodeURIComponent(tmp.innerText)}`)
+            .then(response => response.json()).then(json => {
+                //console.log(json);
+
+                if (json.src !== TARGET) {
+                    for (const sentence of json.sentences) {
+                        const line = sentence.trans.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        this._ntext.innerHTML += line;
+                    }
+                } else {
+                    this._ntext.innerHTML = this._otext.innerHTML;
+                    //console.log("same source and target language");
                 }
-                this._ntext.innerHTML += '</div>';
+
+                for (anchor of anchors) {
+                    if (/^(?:(\d{1,2}):)?([0-5]?[0-9]):([0-5][0-9])$/.test(anchor.innerText)) {
+                        // timestamp anchor
+                        anchor.classList.add("timestamp-link");
+
+                    } else if (anchor.href === '') {
+                        anchor.href = (anchor.innerText.startsWith('http') ? '' : 'https://') + anchor.innerText;
+                    }
+                    this._ntext.innerHTML = this._ntext.innerHTML.replace(anchor.innerText, anchor.outerHTML);
+
+                }
+
+                for (const timestampAnchor of this._ntext.querySelectorAll('.timestamp-link')) {
+                    timestampAnchor.onclick = (e) => {
+                        e.preventDefault();
+                        videoPlayer.currentTime = parseInt(timestampAnchor.href.split('&t=').pop());
+                        videoPlayer.play();
+                        videoPlayer.scrollIntoView({ behavior: 'smooth' });
+
+                    };
+                }
+
                 this.onclick();
+
             }).catch(error => {
                 console.error('Translate Request error:', error);
             });
@@ -62,16 +92,16 @@
     function TranslateButton(main) {
         let tb = document.createElement("a");
         tb.id = "translate-button";
-        tb.style = "margin-left: 5px; cursor: pointer;";
         tb.classList = "yt-simple-endpoint style-scope yt-formatted-string";
 
         tb._otext = main.querySelector(QS_CONTENT_TEXT);
+        // for example when an user edit a comment
         tb._otext.addEventListener("DOMSubtreeModified", _ => ResetTranslateButton(tb));
 
         tb._ntext = document.createElement("div");
         tb._ntext.style.whiteSpace = "pre-wrap";
         tb._ntext.id = "content-text";
-        tb._ntext.classList = "style-scope ytd-comment-renderer translate-text yt-formatted-string";
+        tb._ntext.classList = "style-scope ytd-comment-renderer yt-formatted-string";
 
         ResetTranslateButton(tb);
 
@@ -99,15 +129,18 @@
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function addAutoTranslateButton(parent) {
+    function addAutoTranslateButton(parent, isShort = false) {
+        const btnSize = isShort ? 'xs' : 'm';
         const html = `
-            <div style="margin-left: auto;">
-                <button class="auto-translate-btn yt-spec-button-shape-next yt-spec-button-shape-next--tonal yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m">
+            <div style="margin-left: auto; margin-right: 5px">
+                <button class="auto-translate-btn yt-spec-button-shape-next yt-spec-button-shape-next--filled yt-spec-button-shape-next--call-to-action yt-spec-button-shape-next--size-${btnSize}">
                     ${autoTranslateButtonText()}
                 </button>
             </div>
         `;
-        parent.insertAdjacentHTML('beforeend', html);
+        if (isShort) parent.querySelector('#menu').insertAdjacentHTML('beforebegin', html);
+        else parent.insertAdjacentHTML('beforeend', html);
+
         const autoTranslateButtons = document.querySelectorAll('.auto-translate-btn');
 
         for (const btn of autoTranslateButtons) {
@@ -129,7 +162,7 @@
     }
 
     function autoTranslateButtonText() {
-        return (autoTranslate ? 'Disable' : 'Enable') + ' Auto Comment Translation';
+        return `${autoTranslate ? 'Disable' : 'Enable'} Auto Translation`;
     }
 
     /* Query Selectors */
@@ -137,7 +170,6 @@
     const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-button";
     const QS_CONTENT_TEXT = "#expander>#content>#content-text";
     const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string";
-
     /* User settings */
     var TARGET = getDefaultLanguage();
 
@@ -167,11 +199,12 @@
     const languageName = new Intl.DisplayNames(['en'], { type: 'language' });
 
     var translate_text = () => { return "Translate to " + languageName.of(TARGET); };
-    var translate_icon = () => { return `<img src="${browser.runtime.getURL('icons/translate.png')}" alt="${translate_text()}" title="${translate_text()}" width="16" height="16" style="vertical-align: top">`; };
-    var UNDO_ICON = `<img src="${browser.runtime.getURL('icons/undo.png')}" class="undo-icon" alt="Undo" title="Undo" width="16" height="16" style="vertical-align: top">`;
+    var translate_icon = () => { return `<img src="${browser.runtime.getURL('icons/translate.png')}" alt="${translate_text()}" title="${translate_text()}" width="16" height="16">`; };
+    var UNDO_ICON = `<img src="${browser.runtime.getURL('icons/undo.png')}" class="undo-icon" alt="Undo" title="Undo" width="16" height="16">`;
 
     var buttonObserver = new IntersectionObserver(handleButtonIntersection, { root: null, rootMargin: '0px', threshold: 0 });
     var autoTranslate = false;
+    const videoPlayer = document.querySelector('#movie_player video');
 
     inject();
 
@@ -182,7 +215,7 @@
         const commentObserver = new MutationObserver(e => {
             for (let mut of e) {
 
-                if (mut.target.id == "contents") {
+                if (mut.target.id === "contents") {
                     for (let n of mut.addedNodes) {
                         let main = n.querySelector("#body>#main");
                         if (!main) continue;
@@ -196,8 +229,11 @@
                         }
                     }
                 }
+
                 if (mut.target.nodeName === 'YTD-COMMENTS-HEADER-RENDERER') {
                     addAutoTranslateButton(mut.target.querySelector('#title'));
+                } else if (mut.target.nodeName === 'YTD-ENGAGEMENT-PANEL-TITLE-HEADER-RENDERER') { // for shorts
+                    addAutoTranslateButton(mut.target.querySelector('#header'), true);
                 }
             }
         });

@@ -1,0 +1,15 @@
+div#content-text .small-emoji.emoji {
+    width: 16px;
+    height: 16px;
+    margin: 0px 2px 3px;
+    vertical-align: middle;
+}
+
+#translate-button {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+#translate-button>img {
+    vertical-align: top;
+}
