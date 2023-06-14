@@ -62,6 +62,7 @@
                     this._ntext.innerHTML = this._ntext.innerHTML.replace(anchor.innerText, anchor.outerHTML);
 
                 }
+                const videoPlayer = document.querySelector('#movie_player video');
 
                 for (const timestampAnchor of this._ntext.querySelectorAll('.timestamp-link')) {
                     timestampAnchor.onclick = (e) => {
@@ -204,7 +205,6 @@
 
     var buttonObserver = new IntersectionObserver(handleButtonIntersection, { root: null, rootMargin: '0px', threshold: 0 });
     var autoTranslate = false;
-    const videoPlayer = document.querySelector('#movie_player video');
 
     inject();
 
