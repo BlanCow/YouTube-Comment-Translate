@@ -14,12 +14,10 @@
             this._ntext.parentNode.parentNode.querySelector('#less').click();
             ReplaceNode(this._ntext, this._otext);
             this.innerHTML = translate_icon();
-            this.setAttribute('data-translated', 0);
         } else {
             this._otext.parentNode.parentNode.querySelector('#less').click();
             ReplaceNode(this._otext, this._ntext);
             this.innerHTML = UNDO_ICON;
-            this.setAttribute('data-translated', 1);
         }
     }
 
@@ -63,7 +61,6 @@
 
                 }
                 const videoPlayer = document.querySelector('#movie_player video');
-
                 for (const timestampAnchor of this._ntext.querySelectorAll('.timestamp-link')) {
                     timestampAnchor.onclick = (e) => {
                         e.preventDefault();
@@ -88,6 +85,8 @@
         tb.innerHTML = translate_icon();
         tb.onclick = TranslateButton_Translate;
 
+        if (autoTranslate)
+            buttonObserver.observe(tb);
     }
 
     function TranslateButton(main) {
@@ -105,10 +104,6 @@
         tb._ntext.classList = "style-scope ytd-comment-renderer yt-formatted-string";
 
         ResetTranslateButton(tb);
-
-        if (autoTranslate)
-            buttonObserver.observe(tb);
-
         return tb;
     }
 
@@ -116,10 +111,10 @@
 
         for (const entry of entries) {
             const button = entry.target;
-            if (button.getAttribute('data-translated') === '1') continue;
+            if (button.firstChild.className === 'undo-icon') continue;
 
             if (entry.isIntersecting) {
-                await delay(50 + (Math.random() * 100));
+                await delay(40 + (Math.random() * 80));
                 button.click();
                 buttonObserver.unobserve(button);
             }
@@ -131,6 +126,7 @@
     }
 
     function addAutoTranslateButton(parent, isShort = false) {
+        autoTranslate = false;
         const btnSize = isShort ? 'xs' : 'm';
         const html = `
             <div style="margin-left: auto; margin-right: 5px">
@@ -164,6 +160,15 @@
 
     function autoTranslateButtonText() {
         return `${autoTranslate ? 'Disable' : 'Enable'} Auto Translation`;
+    }
+
+    function resetAutoTranslation() {
+        autoTranslate = false;
+        let buttons = document.querySelectorAll('.auto-translate-btn');
+        for (const btn of buttons) {
+            btn.innerHTML = autoTranslateButtonText();
+        }
+        buttonObserver.disconnect();
     }
 
     /* Query Selectors */
@@ -206,6 +211,11 @@
     var buttonObserver = new IntersectionObserver(handleButtonIntersection, { root: null, rootMargin: '0px', threshold: 0 });
     var autoTranslate = false;
 
+    document.addEventListener("yt-navigate-finish", () => resetAutoTranslation());
+    document.addEventListener("yt-navigate", () => resetAutoTranslation());
+    //document.addEventListener("DOMContentLoaded", () => resetAutoTranslation());
+
+
     inject();
 
     /* Functions */
@@ -216,16 +226,15 @@
             for (let mut of e) {
 
                 if (mut.target.id === "contents") {
+
                     for (let n of mut.addedNodes) {
                         let main = n.querySelector("#body>#main");
                         if (!main) continue;
-
                         let tb = main.querySelector(QS_TRANSLATE_BUTTON);
                         if (tb != null) {
                             ResetTranslateButton(tb);
                         } else {
                             main.querySelector(QS_BUTTON_CONTAINER).appendChild(TranslateButton(main));
-
                         }
                     }
                 }
