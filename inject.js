@@ -151,6 +151,7 @@
                     }
                 } else {
                     buttonObserver.disconnect();
+                    for (const el of document.querySelectorAll('.undo-icon')) { el.click(); }
                 }
             };
         }
@@ -239,9 +240,9 @@
                     }
                 }
 
-                if (mut.target.nodeName === 'YTD-COMMENTS-HEADER-RENDERER') {
+                if (mut.target.nodeName === 'YTD-COMMENTS-HEADER-RENDERER' && window.location.pathname.startsWith('/watch')) {
                     addAutoTranslateButton(mut.target.querySelector('#title'));
-                } else if (mut.target.nodeName === 'YTD-ENGAGEMENT-PANEL-TITLE-HEADER-RENDERER') { // for shorts
+                } else if (mut.target.nodeName === 'YTD-ENGAGEMENT-PANEL-TITLE-HEADER-RENDERER' && window.location.pathname.startsWith('/shorts')) { // for shorts
                     addAutoTranslateButton(mut.target.querySelector('#header'), true);
                 }
             }
