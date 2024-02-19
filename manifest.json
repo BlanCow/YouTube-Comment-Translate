@@ -2,7 +2,7 @@
   "description": "Automatically translate YouTube comments using the Google-Translate API. This extension allows the user to translate YouTube comments with the click of a single button, right next to the comment. ",
   "manifest_version": 2,
   "name": "YouTube\u2122 Comment Translate",
-  "version": "0.1.4.3",
+  "version": "0.1.4.5",
   "author": "BlanCow",
   "icons": {
     "16": "icons/logo/logo-16.png",
@@ -18,12 +18,18 @@
       "id": "{3f156905-a637-4fc4-8e5d-2b2814b7c59b}"
     }
   },
-
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["utils.js", "inject.js"],
-      "css": ["inject.css"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "utils.js",
+        "inject.js"
+      ],
+      "css": [
+        "inject.css"
+      ],
       "run_at": "document_end"
     }
   ],
@@ -31,7 +37,10 @@
     "storage",
     "https://translate.googleapis.com/translate_a/single"
   ],
-  "web_accessible_resources": ["icons/translate.png", "icons/undo.png"],
+  "web_accessible_resources": [
+    "icons/translate.png",
+    "icons/undo.png"
+  ],
   "browser_action": {
     "browser_style": true,
     "default_icon": {
