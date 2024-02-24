@@ -176,7 +176,7 @@
     // From main
     const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-button, #header>#header-author>#published-time-text>#translate-button";
     const QS_CONTENT_TEXT = "#expander>#content>#content-text";
-    const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string, #header>#header-author>#published-time-tex";
+    const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string, #header>#header-author>#published-time-text";
     /* User settings */
     var TARGET = getDefaultLanguage();
 
