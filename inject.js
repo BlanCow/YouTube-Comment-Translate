@@ -33,7 +33,7 @@
             // replace the image with its alternative emoji
         }
 
-        const anchors = tmp.querySelectorAll('a.yt-simple-endpoint');
+        const anchors = tmp.querySelectorAll('a.yt-simple-endpoint,a.yt-core-attributed-string__link');
 
         fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&dj=1&q=${encodeURIComponent(tmp.innerText)}`)
             .then(response => response.json()).then(json => {
