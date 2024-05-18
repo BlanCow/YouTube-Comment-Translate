@@ -196,13 +196,13 @@
     /* User settings */
     var TARGET = getDefaultLanguage();
 
-    browser.storage.local.get(storage_key).then((obj) => {
+    getBrowser().storage.local.get(storage_key).then((obj) => {
         if (obj.hasOwnProperty(storage_key)) {
             TARGET = obj[storage_key];
         }
     });
 
-    browser.storage.onChanged.addListener(function (obj) {
+    getBrowser().storage.onChanged.addListener(function (obj) {
         if (obj.hasOwnProperty(storage_key) && obj[storage_key].hasOwnProperty('newValue')) {
 
             TARGET = obj[storage_key].newValue;
@@ -222,8 +222,8 @@
     const languageName = new Intl.DisplayNames(['en'], { type: 'language' });
 
     var translate_text = () => { return "Translate to " + languageName.of(TARGET); };
-    var translate_icon = () => { return `<img src="${browser.runtime.getURL('icons/translate.png')}" alt="${translate_text()}" title="${translate_text()}" width="16" height="16">`; };
-    var UNDO_ICON = `<img src="${browser.runtime.getURL('icons/undo.png')}" class="undo-icon" alt="Undo" title="Undo" width="16" height="16">`;
+    var translate_icon = () => { return `<img src="${getBrowser().runtime.getURL('icons/translate.png')}" alt="${translate_text()}" title="${translate_text()}" width="16" height="16">`; };
+    var UNDO_ICON = `<img src="${getBrowser().runtime.getURL('icons/undo.png')}" class="undo-icon" alt="Undo" title="Undo" width="16" height="16">`;
 
     var buttonObserver = new IntersectionObserver(handleButtonIntersection, { root: null, rootMargin: '0px', threshold: 0 });
     var autoTranslate = false;

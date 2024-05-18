@@ -16,8 +16,7 @@ for (const iso_code of supported_languages) {
 }
 select.innerHTML = selectHtml;
 
-browser.storage.local.get(storage_key).then((obj) => {
-
+getBrowser().storage.local.get(storage_key).then((obj) => {
     let defaultLanguage = getDefaultLanguage();
     if (!supported_languages.includes(defaultLanguage)) {
         defaultLanguage = "en";
@@ -28,7 +27,7 @@ browser.storage.local.get(storage_key).then((obj) => {
     select.onchange = (e) => {
         let obj = {};
         obj[storage_key] = e.target.value;
-        browser.storage.local.set(obj);
+        getBrowser().storage.local.set(obj);
     };
 
     NiceSelect.bind(select, { searchable: true });
