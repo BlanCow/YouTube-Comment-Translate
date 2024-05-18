@@ -1,8 +1,8 @@
 {
-  "description": "Translate YouTube comments with a single click using Google Translate. The target language is easily customizable and there's also a button to translate all comments automatically. YouTube's default translation button is hidden.",
-  "manifest_version": 3,
+  "description": "Translate YouTube comments with a single click using Google Translate. The target language is easily customizable and there's also a button to translate all comments automatically. YouTube's default translation button is hidden. ",
+  "manifest_version": 2,
   "name": "YouTube\u2122 Comment Translate",
-  "version": "0.1.5.1",
+  "version": "0.1.5.3",
   "author": "BlanCow",
   "icons": {
     "16": "icons/logo/logo-16.png",
@@ -34,23 +34,15 @@
     }
   ],
   "permissions": [
-    "storage"
-  ],
-  "host_permissions": [
+    "storage",
     "https://translate.googleapis.com/translate_a/single"
   ],
   "web_accessible_resources": [
-    {
-      "resources": [
-        "icons/translate.png",
-        "icons/undo.png"
-      ],
-      "matches": [
-        "*://*.youtube.com/*"
-      ]
-    }
+    "icons/translate.png",
+    "icons/undo.png"
   ],
-  "action": {
+  "browser_action": {
+    "browser_style": true,
     "default_icon": {
       "16": "icons/logo/logo-16.png",
       "24": "icons/logo/logo-24.png",
