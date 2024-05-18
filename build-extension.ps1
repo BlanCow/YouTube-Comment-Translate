@@ -31,7 +31,7 @@ New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
 
 
 # Copy all files except the script (.ps1), the build folder, and any manifest files into temporary build folder
-$excludeFiles = @("*.ps1", "build", "manifest_*.json")  # Exclude the script, the build folder, and any manifest files
+$excludeFiles = @("*.ps1", "build", "manifest_*.json", "ReadMe.md", "docs", ".gitignore")  # Exclude the script, the build folder, and any manifest files
 Get-ChildItem -Path $PSScriptRoot -Exclude $excludeFiles | Copy-Item -Destination $tempFolder -Recurse -Force
 
 # Copy the appropriate manifest file based on the target browser
