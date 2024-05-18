@@ -19,9 +19,16 @@ if (-not (Test-Path $buildFolder)) {
     New-Item -ItemType Directory -Force -Path $buildFolder | Out-Null
 }
 
-# Create temporary build folder in the build directory
+
 $tempFolder = "$buildFolder\$baseFolderName" + "-$targetBrowser"
+# delete first the temporary build folder
+if (Test-Path $tempFolder) {
+    Remove-Item -Path $tempFolder -Recurse -Force
+}
+
+# Create temporary build folder in the build directory
 New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null
+
 
 # Copy all files except the script (.ps1), the build folder, and any manifest files into temporary build folder
 $excludeFiles = @("*.ps1", "build", "manifest_*.json")  # Exclude the script, the build folder, and any manifest files
@@ -65,16 +72,35 @@ if (Test-Path $jsFilePath) {
     Write-Host "JavaScript file not found: $jsFilePath"
 }
 
+# Add the .NET assembly for compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 
-# Create zip file including the base folder name
 $zipFileName = "$buildFolder\$baseFolderName" + "-$targetBrowser.zip"
+
+# If the zip file already exists, delete it
 if (Test-Path $zipFileName) {
-    # Update existing zip file with the contents of the temporary build folder
-    Compress-Archive -Path $tempFolder\* -DestinationPath $zipFileName -Update
-} else {
-    # If the zip file doesn't exist, simply create it
-    Compress-Archive -Path $tempFolder\* -DestinationPath $zipFileName
+    Remove-Item $zipFileName
 }
+
+# Create a new zip archive
+$zip = [System.IO.Compression.ZipFile]::Open($zipFileName, 'Update')
+
+# Get all files in the temporary build folder
+$files = Get-ChildItem -Path $tempFolder -Recurse -File
+
+# For each file, replace the backslashes in the file path with forward slashes
+# and add the file to the zip archive with the modified file path
+foreach ($file in $files) {
+    $filePath = $file.FullName
+    $zipFilePath = $filePath.Replace($tempFolder, '').Replace('\', '/')
+    $zipFilePath = $zipFilePath.TrimStart('/')
+    if (Test-Path $filePath) {
+        $null = [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $filePath, $zipFilePath)
+    }
+}
+
+# Save and close the zip archive
+$zip.Dispose()
 
 Write-Host "Extension zip file created: $zipFileName"

@@ -44,7 +44,7 @@ Simply download the extension from https://addons.mozilla.org/en-US/firefox/addo
 ## Build
 
 For developers who want to fork my project, after making a change, you must build the extension for the browser of your choice (currently only firefox and chrome) with the following command:
-`powershell ./build-extention.ps1 {{ BROWSER_NAME }}` (Windows 10+ is required)
+`powershell ./build-extension.ps1 {{ BROWSER_NAME }}` (Windows 10+ is required)
 
 The command minifies inject.js, create a different manifest.json file depending on the browser and generates a zip file and folder containing the extension data that you can upload to the browser.
 
