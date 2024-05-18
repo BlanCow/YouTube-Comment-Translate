@@ -27,13 +27,26 @@
 
         let tmp = document.createElement("div");
         tmp.innerHTML = this._otext.innerHTML;
-        for (const img of tmp.querySelectorAll('img.emoji')) {
-            img.after(img.alt);
-            img.remove();
-            // replace the image with its alternative emoji
+
+        /** @type {NodeListOf<HTMLImageElement>} */
+        const images = tmp.querySelectorAll('img.yt-core-image');
+        let emojiToImage = new Map();
+        for (const img of images) {
+            // convert emoji url to emoji symbol
+
+            const match = img.src.match(/\/emoji_u([0-9a-fA-F]+)\./);
+            if (match && match.length == 2) {
+                const emoji = String.fromCodePoint(parseInt(match[1], 16));
+                emojiToImage.set(emoji, (img.parentElement ?? img).outerHTML);
+                img.after(emoji);
+                img.remove();
+            }
+
         }
 
         const anchors = tmp.querySelectorAll('a.yt-simple-endpoint,a.yt-core-attributed-string__link');
+
+        //console.log("translate: " + tmp.innerText);
 
         fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&dj=1&q=${encodeURIComponent(tmp.innerText)}`)
             .then(response => response.json()).then(json => {
@@ -49,7 +62,7 @@
                     //console.log("same source and target language");
                 }
 
-                for (anchor of anchors) {
+                for (const anchor of anchors) {
                     if (/^(?:(\d{1,2}):)?([0-5]?[0-9]):([0-5][0-9])$/.test(anchor.innerText)) {
                         // timestamp anchor
                         anchor.classList.add("timestamp-link");
@@ -60,6 +73,11 @@
                     this._ntext.innerHTML = this._ntext.innerHTML.replace(anchor.innerText, anchor.outerHTML);
 
                 }
+
+                for (const [emoji, img] of emojiToImage) {
+                    this._ntext.innerHTML = this._ntext.innerHTML.replace(new RegExp(emoji, 'g'), img);
+                }
+
                 const videoPlayer = document.querySelector('#movie_player video');
                 for (const timestampAnchor of this._ntext.querySelectorAll('.timestamp-link')) {
                     timestampAnchor.onclick = (e) => {
@@ -85,18 +103,17 @@
         tb.innerHTML = translate_icon();
         tb.onclick = TranslateButton_Translate;
 
-        if (autoTranslate)
+        if (autoTranslate) {
             buttonObserver.observe(tb);
+        }
+
     }
 
     function TranslateButton(main) {
         let tb = document.createElement("a");
-        tb.id = "translate-button";
+        tb.id = "translate-btn";
         tb.classList = "yt-simple-endpoint style-scope yt-formatted-string";
-
         tb._otext = main.querySelector(QS_CONTENT_TEXT);
-        // for example when an user edit a comment
-        tb._otext.addEventListener("DOMSubtreeModified", _ => ResetTranslateButton(tb));
 
         tb._ntext = document.createElement("div");
         tb._ntext.style.whiteSpace = "pre-wrap";
@@ -108,13 +125,12 @@
     }
 
     async function handleButtonIntersection(entries, observer) {
-
         for (const entry of entries) {
             const button = entry.target;
             if (button.firstChild.className === 'undo-icon') continue;
 
             if (entry.isIntersecting) {
-                await delay(40 + (Math.random() * 80));
+                await delay(30 + (Math.random() * 10));
                 button.click();
                 buttonObserver.unobserve(button);
             }
@@ -174,7 +190,7 @@
 
     /* Query Selectors */
     // From main
-    const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-button, #header>#header-author>#published-time-text>#translate-button";
+    const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-btn, #header>#header-author>#published-time-text>#translate-btn";
     const QS_CONTENT_TEXT = "#expander>#content>#content-text";
     const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string, #header>#header-author>#published-time-text";
     /* User settings */
@@ -235,6 +251,11 @@
                         if (tb != null) {
                             ResetTranslateButton(tb);
                         } else {
+                            let newTranslateButton = main.querySelector('.translate-button');
+                            if (newTranslateButton != null) {
+                                newTranslateButton.style.display = 'none';
+                            }
+
                             main.querySelector(QS_BUTTON_CONTAINER).appendChild(TranslateButton(main));
                         }
                     }
