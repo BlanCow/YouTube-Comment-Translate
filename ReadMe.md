@@ -6,7 +6,7 @@
 	</br></br>
 		<a href="https://addons.mozilla.org/en-US/firefox/addon/youtube-comment-translate/">
 			<img src="docs/get-the-addon.png">
-		<a href="#">
+		<a href="https://chromewebstore.google.com/detail/youtube-comment-translate/inkldemkdmcdgjdjgbimjkfafpgibaha">
 			<img src="docs/ChromeWebStore_BadgeWBorder_v2_206x58.png">
 	</br></br>
 </p>
@@ -39,7 +39,10 @@ The changes are applied instantly so no need to refresh the youtube page
 
 ## Installation
 
-Simply download the extension from https://addons.mozilla.org/en-US/firefox/addon/youtube-comment-translate/ for Firefox or from [COMING SOON] for Chrome.
+Simply download the extension from
+https://addons.mozilla.org/en-US/firefox/addon/youtube-comment-translate/ for Firefox
+or from
+https://chromewebstore.google.com/detail/youtube-comment-translate/inkldemkdmcdgjdjgbimjkfafpgibaha for Chrome.
 
 ## Build
 
@@ -47,6 +50,3 @@ For developers who want to fork my project, after making a change, you must buil
 `powershell ./build-extension.ps1 {{ BROWSER_NAME }}` (Windows 10+ is required)
 
 The command minifies inject.js, create a different manifest.json file depending on the browser and generates a zip file and folder containing the extension data that you can upload to the browser.
-
-<br>
-The icons used in the README are from the open-source [papirus-icon-theme](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) project
