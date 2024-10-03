@@ -44,7 +44,7 @@
 
         }
 
-        const anchors = tmp.querySelectorAll('a.yt-simple-endpoint,a.yt-core-attributed-string__link');
+        const anchors = tmp.querySelectorAll(QS_YT_LINK);
 
         //console.log("translate: " + tmp.innerText);
 
@@ -57,25 +57,29 @@
                         const line = sentence.trans.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                         this._ntext.innerHTML += line;
                     }
+                    for (const anchor of anchors) {
+                        if (TIME_REGEX.test(anchor.innerText)) {
+                            // timestamp anchor
+                            anchor.classList.add("timestamp-link");
+
+                        } else if (anchor.href === '') {
+                            anchor.href = (anchor.innerText.startsWith('http') ? '' : 'https://') + anchor.innerText;
+                        }
+                        this._ntext.innerHTML = this._ntext.innerHTML.replace(anchor.innerText, anchor.outerHTML);
+
+                    }
+
+                    for (const [emoji, img] of emojiToImage) {
+                        this._ntext.innerHTML = this._ntext.innerHTML.replace(new RegExp(emoji, 'g'), img);
+                    }
                 } else {
                     this._ntext.innerHTML = this._otext.innerHTML;
-                    //console.log("same source and target language");
-                }
-
-                for (const anchor of anchors) {
-                    if (/^(?:(\d{1,2}):)?([0-5]?[0-9]):([0-5][0-9])$/.test(anchor.innerText)) {
-                        // timestamp anchor
-                        anchor.classList.add("timestamp-link");
-
-                    } else if (anchor.href === '') {
-                        anchor.href = (anchor.innerText.startsWith('http') ? '' : 'https://') + anchor.innerText;
+                    for (const anchor of this._ntext.querySelectorAll(QS_YT_LINK)) {
+                        if (TIME_REGEX.test(anchor.innerText)) {
+                            anchor.classList.add("timestamp-link");
+                        }
                     }
-                    this._ntext.innerHTML = this._ntext.innerHTML.replace(anchor.innerText, anchor.outerHTML);
-
-                }
-
-                for (const [emoji, img] of emojiToImage) {
-                    this._ntext.innerHTML = this._ntext.innerHTML.replace(new RegExp(emoji, 'g'), img);
+                    //console.log("same source and target language");
                 }
 
                 const videoPlayer = document.querySelector('#movie_player video');
@@ -193,6 +197,8 @@
     const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-btn, #header>#header-author>#published-time-text>#translate-btn";
     const QS_CONTENT_TEXT = "#expander>#content>#content-text";
     const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string, #header>#header-author>#published-time-text";
+    const QS_YT_LINK = 'a.yt-simple-endpoint,a.yt-core-attributed-string__link';
+    const TIME_REGEX = /^(?:(\d{1,2}):)?([0-5]?[0-9]):([0-5][0-9])$/;
     /* User settings */
     var TARGET = getDefaultLanguage();
 
