@@ -52,35 +52,26 @@
             .then(response => response.json()).then(json => {
                 //console.log(json);
 
-                if (json.src !== TARGET) {
-                    for (const sentence of json.sentences) {
-                        const line = sentence.trans.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                        this._ntext.innerHTML += line;
-                    }
-                    for (const anchor of anchors) {
-                        if (TIME_REGEX.test(anchor.innerText)) {
-                            // timestamp anchor
-                            anchor.classList.add("timestamp-link");
-
-                        } else if (anchor.href === '') {
-                            anchor.href = (anchor.innerText.startsWith('http') ? '' : 'https://') + anchor.innerText;
-                        }
-                        this._ntext.innerHTML = this._ntext.innerHTML.replace(anchor.innerText, anchor.outerHTML);
-
-                    }
-
-                    for (const [emoji, img] of emojiToImage) {
-                        this._ntext.innerHTML = this._ntext.innerHTML.replace(new RegExp(emoji, 'g'), img);
-                    }
-                } else {
-                    this._ntext.innerHTML = this._otext.innerHTML;
-                    for (const anchor of this._ntext.querySelectorAll(QS_YT_LINK)) {
-                        if (TIME_REGEX.test(anchor.innerText)) {
-                            anchor.classList.add("timestamp-link");
-                        }
-                    }
-                    //console.log("same source and target language");
+                for (const sentence of json.sentences) {
+                    const line = sentence.trans.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    this._ntext.innerHTML += line;
                 }
+                for (const anchor of anchors) {
+                    if (TIME_REGEX.test(anchor.innerText)) {
+                        // timestamp anchor
+                        anchor.classList.add("timestamp-link");
+
+                    } else if (anchor.href === '') {
+                        anchor.href = (anchor.innerText.startsWith('http') ? '' : 'https://') + anchor.innerText;
+                    }
+                    this._ntext.innerHTML = this._ntext.innerHTML.replace(anchor.innerText, anchor.outerHTML);
+
+                }
+
+                for (const [emoji, img] of emojiToImage) {
+                    this._ntext.innerHTML = this._ntext.innerHTML.replace(new RegExp(emoji, 'g'), img);
+                }
+
 
                 const videoPlayer = document.querySelector('#movie_player video');
                 for (const timestampAnchor of this._ntext.querySelectorAll('.timestamp-link')) {
