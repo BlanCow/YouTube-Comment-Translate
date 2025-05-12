@@ -113,7 +113,7 @@
         tb._ntext = document.createElement("div");
         tb._ntext.style.whiteSpace = "pre-wrap";
         tb._ntext.id = "content-text";
-        tb._ntext.classList = "style-scope ytd-comment-renderer yt-formatted-string";
+        tb._ntext.classList = "style-scope yt-formatted-string ytd-comment-view-model";
 
         ResetTranslateButton(tb);
         return tb;
