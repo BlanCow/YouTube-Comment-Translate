@@ -2,7 +2,7 @@
   "description": "Translate YouTube comments instantly with Google Translate. Customizable target language and a button to auto translate all comments",
   "manifest_version": 3,
   "name": "YouTube\u2122 Comment Translate Enhanced",
-  "version": "0.1.5.4",
+  "version": "0.1.5.5",
   "author": "BlanCow",
   "icons": {
     "16": "icons/logo/logo-16.png",

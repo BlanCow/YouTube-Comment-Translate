@@ -29,7 +29,7 @@
         tmp.innerHTML = this._otext.innerHTML;
 
         /** @type {NodeListOf<HTMLImageElement>} */
-        const images = tmp.querySelectorAll('img.yt-core-image');
+        const images = tmp.querySelectorAll('img.yt-core-attributed-string__image-element');
         let emojiToImage = new Map();
         for (const img of images) {
             // convert emoji url to emoji symbol
