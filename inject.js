@@ -219,7 +219,7 @@
     const languageName = new Intl.DisplayNames(['en'], { type: 'language' });
 
     var translate_text = () => { return "Translate to " + languageName.of(TARGET); };
-    var translate_icon = () => { return `<img src="${getBrowser().runtime.getURL('icons/translate.png')}" alt="${translate_text()}" title="${translate_text()}" width="16" height="16">`; };
+    var translate_icon = () => { return `<img src="${getBrowser().runtime.getURL('icons/translate.png')}" alt="translate" title="${translate_text()}" width="16" height="16">`; };
     var UNDO_ICON = `<img src="${getBrowser().runtime.getURL('icons/undo.png')}" class="undo-icon" alt="Undo" title="Undo" width="16" height="16">`;
 
     var buttonObserver = new IntersectionObserver(handleButtonIntersection, { root: null, rootMargin: '0px', threshold: 0 });
@@ -239,9 +239,9 @@
         const commentObserver = new MutationObserver(e => {
             for (let mut of e) {
 
-                if (mut.target.id === "contents") {
-
+                if (mut.target.id === "comment") {
                     for (let n of mut.addedNodes) {
+                        if (n.nodeType !== Node.ELEMENT_NODE) continue;
                         let main = n.querySelector("#body>#main");
                         if (!main) continue;
                         let tb = main.querySelector(QS_TRANSLATE_BUTTON);
