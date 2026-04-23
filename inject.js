@@ -138,10 +138,10 @@
 
     function addAutoTranslateButton(parent, isShort = false) {
         autoTranslate = false;
-        const btnSize = isShort ? 'xs' : 'm';
+        const btnSize = isShort ? 'Xs' : 'M';
         const html = `
             <div style="margin-left: auto; margin-right: 5px">
-                <button class="auto-translate-btn yt-spec-button-shape-next yt-spec-button-shape-next--filled yt-spec-button-shape-next--call-to-action yt-spec-button-shape-next--size-${btnSize}">
+                <button class="auto-translate-btn ytSpecButtonShapeNextHost ytSpecButtonShapeNextFilled ytSpecButtonShapeNextCallToAction ytSpecButtonShapeNextSize${btnSize} ytSpecButtonShapeNextEnableBackdropFilterExperiment">
                     ${autoTranslateButtonText()}
                 </button>
             </div>
