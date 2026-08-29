@@ -48,7 +48,7 @@
 
         //console.log("translate: " + tmp.innerText);
 
-        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${TARGET}&dt=t&dj=1&q=${encodeURIComponent(tmp.innerText)}`)
+        fetch(`https://translate-pa.googleapis.com/v1/translate?params.client=gtx&query.source_language=auto&key=AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA&data_types=TRANSLATION&data_types=SENTENCE_SPLITS&data_types=BILINGUAL_DICTIONARY_FULL&query.target_language=${TARGET}&query.display_language=${TARGET}&query.text=${encodeURIComponent(tmp.innerText)}`)
             .then(response => response.json()).then(json => {
                 //console.log(json);
 
@@ -188,7 +188,7 @@
     const QS_TRANSLATE_BUTTON = "#header>#header-author>yt-formatted-string>#translate-btn, #header>#header-author>#published-time-text>#translate-btn";
     const QS_CONTENT_TEXT = "#expander>#content>#content-text";
     const QS_BUTTON_CONTAINER = "#header>#header-author>yt-formatted-string, #header>#header-author>#published-time-text";
-    const QS_YT_LINK = 'a.yt-simple-endpoint,a.yt-core-attributed-string__link';
+    const QS_YT_LINK = 'a.yt-simple-endpoint,a.ytAttributedStringLink';
     const TIME_REGEX = /^(?:(\d{1,2}):)?([0-5]?[0-9]):([0-5][0-9])$/;
     /* User settings */
     var TARGET = getDefaultLanguage();
